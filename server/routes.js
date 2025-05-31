@@ -1,28 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const Video = require('./models/Video');
+const { exec } = require('child_process');
+const path = require('path');
 
-
-// POST - Save a new video
-router.post('/api/videos', async (req, res) => {
-  try {
-    const newVideo = new Video(req.body);
-    const savedVideo = await newVideo.save();
-    res.status(201).json(savedVideo);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+router.get('/ping', (req, res) => {
+  res.json({ message: "Ping route is alive" });
 });
-console.log(typeof Video); // should be 'function'
 
-// GET - Fetch all videos
-router.get('/api/videos', async (req, res) => {
-  try {
-    const videos = await Video.find();
-    res.json(videos);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+router.post('/tts', (req, res) => {
+  const { text } = req.body;
+
+  if (!text) {
+    return res.status(400).json({ error: 'Missing text input' });
   }
+
+  const pythonScript = path.join(__dirname, 'python', 'gtts_generate.py');
+  const command = `python "${pythonScript}" "${text.replace(/"/g, '\\"')}"`;
+
+  exec(command, (error, stdout, stderr) => {
+    if (error || stderr) {
+      return res.status(500).json({ error: stderr || error.message });
+    }
+
+    console.log(stdout);
+    console.log("Running:", command);
+    res.status(200).json({ message: 'Audio generated', file: '/audio/voice.mp3' });
+  });
 });
 
 module.exports = router;
