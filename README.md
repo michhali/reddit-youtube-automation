@@ -1,30 +1,45 @@
-# Reddit-youtube-automation
+# Reddit-to-YouTube Automation
 
-A full-stack dashboard to manage Reddit-to-YouTube content automation — submit threads, track videos, and view performance analytics.
+A full-stack application that turns Reddit threads into storytelling-style YouTube videos using AI voiceovers, captions, and background visuals. Includes a dashboard for submitting threads, managing generated content, and tracking performance analytics.
 
 ## Tech Stack
 
-- **Frontend**: React + Tailwind CSS (planned)
-- **Backend**: Node.js + Express
-- **Database**: Firebase or MongoDB Atlas
-- **APIs**: YouTube Data API, OpenAI API (optional)
-- **Hosting**: Vercel (frontend), Render (backend)
+* **Frontend**: React + Tailwind CSS (planned)
+* **Backend**: Node.js + Express
+* **Database**: MongoDB Atlas
+* **APIs**:
 
-## Features (Planned)
+  * YouTube Data API
+  * OpenAI API (optional)
+  * gTTS (Google Text-to-Speech)
+* **Video Generation**: Python + MoviePy
+* **Hosting**:
 
-- Submit Reddit thread URL for processing
-- Track YouTube videos generated from content
-- View stats: views, likes, comments
-- Logs of automation events and timestamps
-- Optional: title suggestions using OpenAI
-- Optional: video scheduling system
+  * Vercel (frontend)
+  * Render or Railway (backend)
 
-##  Development Roadmap
+## Core Features (Completed)
 
--  Week 1: Project setup, repo, backend starter
--  Week 2: Add MongoDB/Firebase, define schema, test CRUD
--  Week 3: Build frontend input form, st
--  Week 4: Add dashboard + YouTube API stats
--  Week 5: Polish UI/UX + deploy backend/frontend
--  Week 6: Final review, add blog post + resume update
+* [x] Submit Reddit thread text for TTS processing
+* [x] Generate voiceovers as MP3 using gTTS
+
+## Development Roadmap (Completed)
+
+**Week 1**
+
+* [x] Initialize project repo
+* [x] Set up Node.js + Express backend
+* [x] Create `/api/tts` route for audio generation
+
+## Usage (In Progress)
+
+1. Paste a Reddit post (or URL)
+2. System generates voiceover + captions
+3. Background video is selected
+4. Final storytelling-style video is generated
+5. Option to upload or download the final video
+
+---
+
+**Built with love by Mihail Maravelias**
 
