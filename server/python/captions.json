@@ -1,12 +1,12 @@
 [
   {
     "start": 0.0,
-    "end": 4.13,
-    "text": "This is the title of the Reddit post."
+    "end": 1.92,
+    "text": "Hi my name is Maria"
   },
   {
-    "start": 4.13,
-    "end": 7.68,
-    "text": "Here is the body of the post with more explanation."
+    "start": 1.92,
+    "end": 3.96,
+    "text": "I am twenty five years old"
   }
 ]

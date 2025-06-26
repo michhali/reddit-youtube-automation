@@ -1,8 +1,8 @@
+# ✅ Fully patched make_video.py using voice_*.mp3 and actual captions
 import os
 import json
 import random
 from pathlib import Path
-from gtts import gTTS
 from pydub import AudioSegment
 from moviepy.editor import (
     VideoFileClip, concatenate_videoclips,
@@ -10,45 +10,42 @@ from moviepy.editor import (
 )
 import moviepy.config as mpyconf
 
-# Optional: force path to ImageMagick
 mpyconf.IMAGEMAGICK_BINARY = "C:\\Program Files\\ImageMagick-7.1.1-Q16\\magick.exe"
 
 # ========== CONFIG ==========
-reddit_parts = [
-    "This is the title of the Reddit post.",
-    "Here is the body of the post with more explanation."
-]
 audio_dir = Path("..") / "audio"
 audio_dir.mkdir(parents=True, exist_ok=True)
 bg_folder = Path("C:/Users/micha/OneDrive/Computer/background")
 output_json_path = Path("captions.json")
 output_video_path = "final_video.mp4"
 
-# ========== STEP 1: Generate Voice Clips ==========
-print("🎤 Generating TTS voice clips...")
+# ========== STEP 1: Load all voice_*.mp3 clips ==========
+print("🔎 Scanning for voice clips...")
+voice_files = sorted(audio_dir.glob("voice_*.mp3"))
 
-for i, text in enumerate(reddit_parts):
-    audio_path = audio_dir / f"voice_{i}.mp3"
-    if not audio_path.exists():
-        print(f"🗣️  Generating voice_{i}.mp3...")
-        tts = gTTS(text)
-        tts.save(audio_path)
-    else:
-        print(f"✅ voice_{i}.mp3 already exists")
+if not voice_files:
+    print("❌ No voice_*.mp3 files found. Did you run the TTS step?")
+    exit(1)
 
-# ========== STEP 2: Generate captions.json ==========
+# Use actual caption lines (OPTIONAL - match Postman input)
+caption_lines = [
+    "Hi my name is Maria",
+    "I am twenty five years old"
+]
+
+# ========== STEP 2: Generate captions ==========
 print("📝 Generating captions.json...")
-
 output_json = []
 current_time = 0.0
+final_audio = AudioSegment.empty()
 
-for i, text in enumerate(reddit_parts):
-    audio_path = audio_dir / f"voice_{i}.mp3"
-    if not audio_path.exists():
-        print(f"⚠️ Missing audio: {audio_path}")
-        continue
+for i, clip_path in enumerate(voice_files):
+    segment = AudioSegment.from_file(clip_path)
+    final_audio += segment
+    duration = segment.duration_seconds
 
-    duration = AudioSegment.from_file(audio_path).duration_seconds
+    text = caption_lines[i] if i < len(caption_lines) else f"[Caption {i+1}]"
+
     caption = {
         "start": round(current_time, 2),
         "end": round(current_time + duration, 2),
@@ -59,18 +56,9 @@ for i, text in enumerate(reddit_parts):
 
 with open(output_json_path, "w") as f:
     json.dump(output_json, f, indent=2)
-
 print("✅ captions.json generated.")
 
-# ========== STEP 3: Combine audio ==========
-print("🔊 Combining voice clips...")
-final_audio = AudioSegment.empty()
-
-for i in range(len(output_json)):
-    audio_path = audio_dir / f"voice_{i}.mp3"
-    segment = AudioSegment.from_file(audio_path)
-    final_audio += segment
-
+# ========== STEP 3: Export combined audio ==========
 combined_audio_path = "combined_voice.mp3"
 final_audio.export(combined_audio_path, format="mp3")
 audio_duration = len(final_audio) / 1000.0
@@ -85,7 +73,7 @@ bg_clip = VideoFileClip(str(bg_video_path)).without_audio()
 loops = int(audio_duration // bg_clip.duration) + 1
 looped_clip = concatenate_videoclips([bg_clip] * loops).subclip(0, audio_duration)
 
-# ========== STEP 5: Load captions ==========
+# ========== STEP 5: Render captions ==========
 print("📝 Rendering captions...")
 with open(output_json_path, "r") as f:
     captions = json.load(f)
@@ -107,19 +95,9 @@ for i, caption in enumerate(captions):
     except Exception as e:
         print(f"  ❌ Failed to render caption {i+1}: {e}")
 
-# ========== STEP 6: Final render ==========
+# ========== STEP 6: Final video ==========
 print("🎬 Rendering final video...")
-
-# Load the generated TTS audio
 audio = AudioFileClip(combined_audio_path)
-
-# Combine background video with captions and set audio
-try:
-    final_video = CompositeVideoClip([looped_clip, *text_clips]).set_audio(audio)
-    final_video.write_videofile(output_video_path, fps=30, codec="libx264", audio_codec="aac")
-    print("✅ final_video.mp4 created successfully.")
-except Exception as e:
-    print(f"❌ Failed to render video: {e}")
-
-print("✅ Done! Your video is ready:")
-
+final_video = CompositeVideoClip([looped_clip, *text_clips]).set_audio(audio)
+final_video.write_videofile(output_video_path, fps=30, codec="libx264", audio_codec="aac")
+print("✅ final_video.mp4 created successfully.")
