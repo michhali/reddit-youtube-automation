@@ -5,11 +5,10 @@ from pydub.utils import mediainfo
 from pathlib import Path
 
 # Reddit post broken into parts (title, body, top comment)
-parts = [
-    "This is the title of the post.",
-    "Here is the body of the post that goes into more detail.",
-    "Top comment: this is hilarious."
-]
+import json
+
+with open("text_lines.json", "r") as f:
+    parts = json.load(f)
 
 # Directory where voice clips are saved
 audio_dir = Path("..") / "audio"
@@ -40,4 +39,4 @@ for i, text in enumerate(parts):
 with open("captions.json", "w") as f:
     json.dump(output_json, f, indent=2)
 
-print("✅ captions.json generated.")
+print(" captions.json generated.")

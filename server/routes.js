@@ -1,42 +1,44 @@
-
-// ✅ Updated routes.js to support array of text inputs via "parts"
 const express = require('express');
 const router = express.Router();
-const { exec } = require('child_process');
+
+const { execSync } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
-router.get('/ping', (req, res) => {
-  res.json({ message: "Ping route is alive" });
-});
+const pythonDir = path.join(__dirname, 'python');
 
-router.post('/tts', (req, res) => {
-  const { parts } = req.body;
+router.post('/essay-to-video', async (req, res) => {
+  const { text } = req.body;
+  if (!text) return res.status(400).json({ error: 'No text provided' });
 
-  if (!parts || !Array.isArray(parts) || parts.length === 0) {
-    return res.status(400).json({ error: 'Missing or invalid "parts" array' });
+  const textLinesPath = path.join(pythonDir, 'text_lines.json');
+  const captionsPath = path.join(pythonDir, 'captions.json');
+
+  // Step 1: Save the text lines
+  const lines = text.split('\n').filter(line => line.trim() !== '');
+  fs.writeFileSync(textLinesPath, JSON.stringify(lines, null, 2));
+  console.log(`✅ Saved ${lines.length} lines to text_lines.json`);
+
+  // Step 2: Generate captions
+  try {
+    execSync(`python generate_captions_json.py`, { cwd: pythonDir });
+    console.log("✅ captions.json generated");
+  } catch (err) {
+    console.error("generate_captions_json.py failed:", err.message);
+    return res.status(500).json({ error: 'Caption generation failed' });
   }
 
-  const scriptPath = path.join(__dirname, 'python', 'gtts_generate.py');
+  // Step 3: Generate video
+  try {
+    execSync(`python make_video.py`, { cwd: pythonDir });
+    console.log("✅ Video generated");
+  } catch (err) {
+    console.error("make_video.py failed:", err.message);
+    return res.status(500).json({ error: 'Video generation failed' });
+  }
 
-  const jobs = parts.map((text, i) => {
-    const escapedText = text.replace(/"/g, '\\"');
-    const command = `python "${scriptPath}" "${escapedText}" ${i}`;
-
-    return new Promise((resolve, reject) => {
-      exec(command, (err, stdout, stderr) => {
-        if (err) {
-          console.error(stderr || err.message);
-          return reject(stderr || err.message);
-        }
-        console.log(stdout);
-        resolve();
-      });
-    });
-  });
-
-  Promise.all(jobs)
-    .then(() => res.status(200).json({ message: 'All audio clips generated successfully' }))
-    .catch(error => res.status(500).json({ error }));
+  // Step 4: Respond with video path
+  res.json({ video: 'final_video.mp4' });
 });
 
 module.exports = router;
