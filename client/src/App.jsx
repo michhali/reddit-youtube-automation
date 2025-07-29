@@ -36,7 +36,10 @@ function App() {
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>Essay ➜ YouTube Video Generator</h1>
+     <h1>
+  <span className="youtube-box">Reddit ➜ YouTube</span> Video Generator
+</h1>
+
 
       <h2>Paste Essay or Long Text</h2>
       <form onSubmit={handleSubmit}>
@@ -54,12 +57,21 @@ function App() {
         </button>
       </form>
 
-      {videoReady && (
-        <div style={{ marginTop: '2rem' }}>
-          <h2>✅ Your video is ready:</h2>
-          <video src={videoPath} controls width="100%" />
-        </div>
-      )}
+  {videoReady && (
+  <div style={{ marginTop: '2rem' }}>
+    <h2>Your video is ready:</h2>
+    <video src={videoPath} controls width="100%" />
+    <br />
+    <a
+      href={videoPath}
+      download="reddit_story.mp4"
+      className="download-button"
+    >
+      Download Video
+    </a>
+  </div>
+)}
+
     </div>
   );
 }

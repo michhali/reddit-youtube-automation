@@ -4,6 +4,14 @@
   padding: 2rem;
   text-align: center;
 }
+.youtube-box {
+  background-color: #ff0000;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
 
 .logo {
   height: 6em;
@@ -39,4 +47,19 @@
 
 .read-the-docs {
   color: #888;
+}
+.download-button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.3s;
+}
+
+.download-button:hover {
+  background-color: #45a049;
 }

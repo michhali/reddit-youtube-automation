@@ -1,7 +1,7 @@
 import os
 import json
 import moviepy.config as mpyconf
-mpyconf.IMAGEMAGICK_BINARY = "C:\\Program Files\\ImageMagick-7.1.1-Q16\\magick.exe"
+mpyconf.IMAGEMAGICK_BINARY = "C:\\Program Files\\ImageMagick-7.1.2-Q16\\magick.exe"
 
 import random
 from pathlib import Path
@@ -67,7 +67,7 @@ for i, caption in enumerate(captions):
 # Final composition with audio
 audio = AudioFileClip(audio_output_path)
 video = CompositeVideoClip([looped_clip] + text_clips).set_audio(audio)
-video.write_videofile("final_video.mp4", fps=30)
+print(f"✅ Total captions rendered: {len(text_clips)}")
 
-print("✅ Rendered final_video.mp4")
+print("✅ Starting final render...")
 video.write_videofile("final_video.mp4", fps=30, verbose=True, progress_bar=True)
